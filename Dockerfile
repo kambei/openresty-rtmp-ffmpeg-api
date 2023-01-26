@@ -105,7 +105,6 @@ ARG FFMPEG_CONFIG_OPTIONS="\
     --disable-debug \
 	--disable-doc \ 
 	--disable-ffplay \ 
-    --enable-avresample \ 
     --enable-gnutls \
     --enable-gpl \ 
     --enable-libass \ 
