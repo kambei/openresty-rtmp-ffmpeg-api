@@ -27,7 +27,7 @@
 ################
 
 # Builder image
-FROM golang:1.11.2-alpine3.8 as builder
+FROM golang:1.19-alpine as builder
 WORKDIR /work
 
 # enable gin gonic relase mode
@@ -47,7 +47,7 @@ RUN \
 
 # Main image
 FROM openresty/openresty:alpine
-LABEL maintainer="Thiago Zimmermann thiago-dev902<at>outlook.com"
+LABEL maintainer="Andrea 'Kambei' Bovi and.bovi<at>gmail.com"
 
 #######################
 # Environment variables
@@ -59,12 +59,12 @@ ENV PATH=$PATH:/usr/local/openresty/luajit/bin:/usr/local/openresty/nginx/sbin:/
 ########################
 # Docker Build Arguments
 ARG BUILD_DATE
-ARG NGINX_RTMP_VERSION="1.2.1"
+ARG NGINX_RTMP_VERSION="1.2.2"
 
-ARG RESTY_VERSION="1.13.6.2"
-ARG RESTY_OPENSSL_VERSION="1.0.2p"
-ARG RESTY_PCRE_VERSION="8.42"
-ARG RESTY_LUAROCKS_VERSION="2.4.4"
+ARG RESTY_VERSION="1.21.4.1"
+ARG RESTY_OPENSSL_VERSION="3.0.7"
+ARG RESTY_PCRE_VERSION="8.45"
+ARG RESTY_LUAROCKS_VERSION="3.9.2"
 ARG RESTY_CONFIG_OPTIONS_MORE=""
 ARG RESTY_J="1"
 ARG RESTY_CONFIG_OPTIONS="\
@@ -98,9 +98,9 @@ ARG RESTY_CONFIG_OPTIONS="\
     --with-threads \
     "
 # These are not intended to be user-specified
-ARG _RESTY_CONFIG_DEPS="--with-openssl=/tmp/openssl-${RESTY_OPENSSL_VERSION} --add-module=/tmp/nginx-rtmp-module-${NGINX_RTMP_VERSION} --with-pcre=/tmp/pcre-${RESTY_PCRE_VERSION}"
+ARG _RESTY_CONFIG_DEPS="--with-openssl=/tmp/openssl-openssl-${RESTY_OPENSSL_VERSION} --add-module=/tmp/nginx-rtmp-module-${NGINX_RTMP_VERSION} --with-pcre=/tmp/pcre-${RESTY_PCRE_VERSION}"
 
-ARG FFMPEG_VERSION="4.0.2"
+ARG FFMPEG_VERSION="5.1.2"
 ARG FFMPEG_CONFIG_OPTIONS="\
     --disable-debug \
 	--disable-doc \ 
@@ -128,8 +128,10 @@ ARG FFMPEG_CONFIG_OPTIONS="\
 
 LABEL org.label-schema.schema-version="1.0"
 LABEL org.label-schema.build-date=${BUILD_DATE}
-LABEL org.label-schema.name="thiagodev/openresty-rtmp-ffmpeg-api"
+LABEL org.label-schema.name="kambei/openresty-rtmp-ffmpeg-api"
 LABEL org.label-schema.description="Example of nginx-rtmp for streaming, including ffmpeg and videojs for playback."
+
+COPY pcre-8.45.tar.gz /tmp/pcre-8.45.tar.gz
 
 #####################################################
 # Build steps
@@ -184,13 +186,12 @@ RUN apk add --no-cache --virtual .build-deps \
         x265-dev \
 	    yasm-dev \
     && cd /tmp \
-    && curl -fSL https://www.openssl.org/source/openssl-${RESTY_OPENSSL_VERSION}.tar.gz -o openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
+    && curl -fSL https://github.com/openssl/openssl/archive/refs/tags/openssl-${RESTY_OPENSSL_VERSION}.tar.gz -o openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
     && tar xzf openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
-    && curl -fSL https://github.com/luarocks/luarocks/archive/${RESTY_LUAROCKS_VERSION}.tar.gz -o luarocks-${RESTY_LUAROCKS_VERSION}.tar.gz \
+    && curl -fSL https://github.com/luarocks/luarocks/archive/refs/tags/v${RESTY_LUAROCKS_VERSION}.tar.gz -o luarocks-${RESTY_LUAROCKS_VERSION}.tar.gz \
     && tar xzf luarocks-${RESTY_LUAROCKS_VERSION}.tar.gz \
     && curl -fSL https://github.com/arut/nginx-rtmp-module/archive/v$NGINX_RTMP_VERSION.tar.gz -o nginx-rtmp-module.tar.gz \
     && tar xzf nginx-rtmp-module.tar.gz \
-    && curl -fSL https://ftp.pcre.org/pub/pcre/pcre-${RESTY_PCRE_VERSION}.tar.gz -o pcre-${RESTY_PCRE_VERSION}.tar.gz \
     && tar xzf pcre-${RESTY_PCRE_VERSION}.tar.gz \
     && curl -sL https://www.ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.gz -o ffmpeg.tar.gz \
     && tar xzf ffmpeg.tar.gz \
@@ -217,7 +218,7 @@ RUN apk add --no-cache --virtual .build-deps \
 	  && make distclean \
     && cd /tmp \
     && rm -rf \
-        openssl-${RESTY_OPENSSL_VERSION} \
+        openssl-openssl-${RESTY_OPENSSL_VERSION} \
         openssl-${RESTY_OPENSSL_VERSION}.tar.gz \
         luarocks-${RESTY_LUAROCKS_VERSION} luarocks-${RESTY_LUAROCKS_VERSION}.tar.gz \
         nginx-rtmp-module-${NGINX_RTMP_VERSION} \
