@@ -23,3 +23,8 @@ docker-compose build
 ```bash
 docker-compose up [-d]
 ```
+
+## Protected endoint
+
+- [http://localhost/protected](http://localhost/protected)
+
