@@ -245,6 +245,9 @@ STOPSIGNAL SIGTERM
 # Copy api and config
 COPY --from=builder /work/go-rtmp-api /
 
+# lua-resty-openidc
+ADD lua-resty-openidc/openidc.lua /usr/local/openresty/lualib/resty/openidc/openidc.lua
+
 # setup cron; see clean-hls-dir.sh for more information
 COPY clean-hls-dir.sh /clean-hls-dir.sh
 RUN chmod +x /clean-hls-dir.sh

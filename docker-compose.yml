@@ -1,7 +1,11 @@
 version: '3'
 services:
-  nginx:
-    image: thiagodev/openresty-rtmp-ffmpeg-api:latest
+
+  streaming-server:
+    image: streaming-server:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     environment:
       - STREAM_KEY=bla
     ports:
@@ -9,3 +13,4 @@ services:
       - "1935:1935"
     volumes:
       - ./etc/nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./lua-resty-openidc:/usr/local/openresty/lualib/resty/openidc:cached
